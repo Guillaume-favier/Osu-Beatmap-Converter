@@ -2,7 +2,7 @@ var fs = require('fs');
 const archiver = require('archiver');
 var ProgressBar = require('progress');
 
-if (process.argv.length <= 3) {
+if (process.argv.length <= 3 || process.argv[2] == "-h") {
     console.log("Usage: " + __filename + " path/to/Songs/ path/to/output");
     process.exit(-1);
 }
@@ -15,7 +15,7 @@ let ouputdir = process.argv[3];
  * @param {String} out
  * @returns {Promise}
  */
-function zipDirectory(source, out, name) {
+function zipDirectory(source, out, cb) {
     const archive = archiver('zip', { zlib: { level: 9 }});
     const stream = fs.createWriteStream(out);
 
@@ -28,13 +28,13 @@ function zipDirectory(source, out, name) {
 
         stream.on('close', () => {
             resolve()
-            name()
+            cb()
         });
         archive.finalize();
     });
 }
 
-fs.readdir(path, function(err, items) {
+fs.readdir(path, (err, items) => {
     // console.log(items);
  
     for (var i=0; i<items.length; i++) {
